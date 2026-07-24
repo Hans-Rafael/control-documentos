@@ -1,3 +1,72 @@
+# ==========================================
+# 1. Variables de Entorno y Credenciales (¡CRÍTICO!)
+# ==========================================
+.env
+.env.local
+*.env
+*.pem
+*.key
+*.p12
+
+# Credenciales de Google / GCP / Service Accounts
+credentials.json
+token.json
+client_secret*.json
+
+# ==========================================
+# 2. Datos de Docker & Persistencia Local
+# ==========================================
+# Ignorar carpetas donde Docker guarde volúmenes o archivos montados
+n8n_data/
+ollama_data/
+files/
+Documentos/
+
+# Base de datos SQLite local de n8n (si se guarda directamente fuera del volumen)
+*.sqlite
+database.sqlite
+
+# ==========================================
+# 3. Archivos del Sistema Operativo (Linux / macOS / Windows)
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# 4. Logs y Archivos Temporales
+# ==========================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# 5. IDEs y Editores de Código
+# ==========================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+
+# ==========================================
+# 6. Archivos Exportados de n8n con Datos Sensibles
+# ==========================================
+# Opcional: si exportas workflows, asegúrate de no exportar credenciales embebidas
+workflows/*_with_credentials.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
