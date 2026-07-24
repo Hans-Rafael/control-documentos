@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_local
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n_local
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Argentina/Buenos_Aires
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - n8n_data:/home/node/.n8n
+      # Recuerda cambiar 'tu_usuario' por tu nombre de usuario en Linux Mint:
+      - /home/tu_usuario/Documentos:/files/Documentos:ro
+    depends_on:
+      - ollama
+
+volumes:
+  n8n_data:
+  ollama_data:
