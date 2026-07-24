@@ -1,0 +1,179 @@
+{
+  "name": "Control de Documentos + Llama 3 + Google Drive",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "path": "/files/Documentos",
+        "events": [
+          "add"
+        ],
+        "options": {}
+      },
+      "id": "1",
+      "name": "Local File Trigger",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "fileContent": "={{ $json.binary }}",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Google Drive Upload",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        450,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "TU_TELEGRAM_CHAT_ID",
+        "text": "={{ '📄 *Nuevo archivo respaldado en Google Drive*\\n\\n*Nombre:* ' + $json.name + '\\n*ID en Drive:* ' + $json.id }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "3",
+      "name": "Notificación Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "4",
+      "name": "Telegram Trigger (Consultas)",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "command": "ls -la /files/Documentos"
+      },
+      "id": "5",
+      "name": "Listar Documentos",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://ollama_local:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3\",\n  \"prompt\": \"Eres un asistente de inventario de archivos. El usuario pregunta por Telegram: '{{ $('Telegram Trigger (Consultas)').item.json.message.text }}'.\\n\\nEsta es la lista actual de archivos e historias en la carpeta Documentos:\\n{{ $json.stdout }}\\n\\nResponde de manera concisa en español si el archivo mencionado está en la lista o no, e indica su nombre exacto o tamaño si existe.\",\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "id": "6",
+      "name": "Consulta a Llama 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger (Consultas)').item.json.message.chat.id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {}
+      },
+      "id": "7",
+      "name": "Respuesta IA por Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        950,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Local File Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Upload": {
+      "main": [
+        [
+          {
+            "node": "Notificación Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger (Consultas)": {
+      "main": [
+        [
+          {
+            "node": "Listar Documentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar Documentos": {
+      "main": [
+        [
+          {
+            "node": "Consulta a Llama 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta a Llama 3": {
+      "main": [
+        [
+          {
+            "node": "Respuesta IA por Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

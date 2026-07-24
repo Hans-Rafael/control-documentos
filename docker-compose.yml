@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_local
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
     container_name: n8n_local
@@ -17,10 +26,11 @@ services:
       - TZ=America/Argentina/Buenos_Aires
     volumes:
       - n8n_data:/home/node/.n8n
-      # Recuerda poner tu usuario real de Mint aquí:
-      - /home/tu_usuario/Documentos:/files/Documentos:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway" # Permite a n8n comunicarse con el Ollama nativo de tu PC
+      # Recuerda cambiar 'tu_usuario' por tu nombre de usuario en Linux Mint:
+      - /home/dell/Documentos:/files/Documentos
+    depends_on:
+      - ollama
 
 volumes:
   n8n_data:
+  ollama_data:
