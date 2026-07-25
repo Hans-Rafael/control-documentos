@@ -22,6 +22,7 @@ services:
       - N8N_PROTOCOL=http
       - NODE_ENV=production
       #- WEBHOOK_URL=http://localhost:5678/
+      # recordar revisar direccion de cuenta gratuita ngrok sigue igual!
       - WEBHOOK_URL=https://jimmy-wrath-undocked.ngrok-free.dev/
       - GENERIC_TIMEZONE=America/Argentina/Buenos_Aires
       - TZ=America/Argentina/Buenos_Aires
@@ -34,6 +35,17 @@ services:
       - /home/dell/Documentos:/files/Documentos
     depends_on:
       - ollama
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok_local
+    restart: unless-stopped
+    command:
+      - "http"
+      - "n8n:5678"
+    ports:
+      - "4040:4040"
+    depends_on:
+      - n8n
 
 volumes:
   n8n_data:
