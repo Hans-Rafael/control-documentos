@@ -21,12 +21,16 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      - WEBHOOK_URL=http://localhost:5678/
+      #- WEBHOOK_URL=http://localhost:5678/
+      - WEBHOOK_URL=https://jimmy-wrath-undocked.ngrok-free.dev/
       - GENERIC_TIMEZONE=America/Argentina/Buenos_Aires
       - TZ=America/Argentina/Buenos_Aires
+      # VARIABLES CRÍTICAS DE SEGURIDAD PARA PASAR EL ERROR DE ACCESO:
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+      - N8N_RESTRICT_FILE_ACCESS_TO=/files;/home/node/.n8n-files
     volumes:
       - n8n_data:/home/node/.n8n
-      # Recuerda cambiar 'tu_usuario' por tu nombre de usuario en Linux Mint:
+      # Mapeo de tu carpeta física de Linux Mint al contenedor:
       - /home/dell/Documentos:/files/Documentos
     depends_on:
       - ollama
