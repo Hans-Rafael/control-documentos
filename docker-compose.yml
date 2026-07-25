@@ -42,6 +42,8 @@ services:
     command:
       - "http"
       - "n8n:5678"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     ports:
       - "4040:4040"
     depends_on:
